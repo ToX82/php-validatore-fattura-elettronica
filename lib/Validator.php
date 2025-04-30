@@ -80,6 +80,45 @@ final class Validator implements ValidatorInterface
     }
 
     /**
+     * @param non-empty-string $xml
+     * @param non-empty-string $type
+     *
+     * @return array<int, string>
+     */
+    public function getAllErrors(string $xml, string $type = self::XSD_FATTURA_ORDINARIA_LATEST): array
+    {
+        $dom          = new DOMDocument();
+        $dom->recover = true;
+        $dom->loadXML($xml, \LIBXML_NOERROR);
+        $xsd = $this->getXsd($type);
+
+        $errors = [];
+        \set_error_handler(static function (int $errno, string $errstr = '', string $errfile = '', int $errline = 0) use (&$errors): bool {
+            $errors[] = $errstr;
+
+            return true;
+        });
+        $dom->schemaValidateSource($xsd);
+        \restore_error_handler();
+
+        if ([] === $errors) {
+            return [];
+        }
+
+        $dom = new DOMDocument();
+        $xmlErrors = [];
+        \set_error_handler(static function (int $errno, string $errstr = '', string $errfile = '', int $errline = 0) use (&$xmlErrors): bool {
+            $xmlErrors[] = $errstr;
+
+            return true;
+        });
+        $dom->loadXML($xml);
+        \restore_error_handler();
+
+        return \array_merge($xmlErrors, $errors);
+    }
+
+    /**
      * @param non-empty-string $type
      *
      * @return non-empty-string

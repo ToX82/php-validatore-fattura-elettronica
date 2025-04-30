@@ -3,9 +3,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
         colors="true"
-        cacheDirectory=".phpunit.cache"
 >
-  <coverage>
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./lib</directory>
+    </include>
     <report>
       <text outputFile="php://stdout" showOnlySummary="true"/>
     </report>
@@ -14,9 +16,4 @@
     <directory>./tests</directory>
   </testsuite>
   <logging/>
-  <source>
-    <include>
-      <directory suffix=".php">./lib</directory>
-    </include>
-  </source>
 </phpunit>
